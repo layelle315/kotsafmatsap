@@ -1,0 +1,34 @@
+pipeline {
+    agent any  // Exécute le pipeline sur n'importe quel agent disponible
+
+    stages {
+        // Étape 1 : Clonage du dépôt GitHub
+        stage('Clonage') {
+            steps {
+                git 'https://github.com/layelle315/mon_projet_docker.git'
+            }
+        }
+
+        // Étape 2 : Construction de l'image Docker
+        stage('Image') {
+            steps {
+                script {
+                    // Construit l'image Docker à partir du Dockerfile
+                    docker.build("kotsaf1/dockerfiley-flask-app")
+                }
+            }
+        }
+
+        // Étape 3 : Publication de l'image sur DockerHub
+        stage('Publication') {
+            steps {
+                script {
+                    // Utilise les identifiants DockerHub pour pousser l'image
+                    docker.withRegistry('https://registry.hub.docker.com', 'dockerhub-credentials') {
+                        docker.image("kotsaf1/dockerfiley-flask-app").push()
+                    }
+                }
+            }
+        }
+    }
+}
